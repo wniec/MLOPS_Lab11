@@ -9,13 +9,13 @@ from mangum import Mangum
 
 app = FastAPI()
 
-tokenizer = Tokenizer.from_file(TOKENIZER_PATH+"/tokenizer.json")
+tokenizer = Tokenizer.from_file(TOKENIZER_PATH + "/tokenizer.json")
 
 embedding_session = ort.InferenceSession(ONNX_MODEL_PATH)
 
 classifier_session = ort.InferenceSession(ONNX_CLASSIFIER_PATH)
 
-SENTIMENT_MAP = {0: 'negative', 1: 'neutral', 2: 'positive'}
+SENTIMENT_MAP = {0: "negative", 1: "neutral", 2: "positive"}
 
 
 class PredictRequest(BaseModel):
@@ -31,17 +31,12 @@ async def predict(request: PredictRequest):
         input_ids = np.array([encoded.ids])
         attention_mask = np.array([encoded.attention_mask])
 
-        embedding_inputs = {
-            "input_ids": input_ids,
-            "attention_mask": attention_mask
-        }
+        embedding_inputs = {"input_ids": input_ids, "attention_mask": attention_mask}
         embeddings = embedding_session.run(None, embedding_inputs)[0]
 
         classifier_input_name = classifier_session.get_inputs()[0].name
 
-        classifier_inputs = {
-            classifier_input_name: embeddings.astype(np.float32)
-        }
+        classifier_inputs = {classifier_input_name: embeddings.astype(np.float32)}
 
         prediction_output = classifier_session.run(None, classifier_inputs)[0]
 
@@ -51,11 +46,14 @@ async def predict(request: PredictRequest):
 
         return {
             "label": label,
-            "confidence_score": float(np.max(prediction_output[0]))  # Optional: return raw score
+            "confidence_score": float(
+                np.max(prediction_output[0])
+            ),  # Optional: return raw score
         }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(f"Internal server error: {e}"))
+
 
 if __name__ == "__main__":
     handler = Mangum(app)

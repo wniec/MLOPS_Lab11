@@ -71,4 +71,5 @@ def export_model_to_onnx():
     print(f"ONNX model exported to {onnx_path}")
     return onnx_path
 
+
 export_model_to_onnx()
