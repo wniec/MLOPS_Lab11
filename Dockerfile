@@ -8,7 +8,7 @@ WORKDIR /app
 # Install dependencies
 COPY pyproject.toml uv.lock ./
 # Sync only inference group to .venv
-RUN uv sync --frozen --extra inference --no-install-project
+RUN uv sync --frozen --no-install-project
 
 # Runtime stage
 FROM python:3.12-slim-bookworm
@@ -26,9 +26,10 @@ COPY sentiment_app ./sentiment_app
 COPY artifacts ./artifacts
 
 COPY src ./src
-
 COPY tokenizer ./tokenizer
 COPY *.onnx .
 
 # Run the application
-CMD ["uvicorn", "sentiment_app.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["uvicorn", "sentiment_app.app:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["python", "-m", "awslambdaric"]
+CMD ["app.handler"]

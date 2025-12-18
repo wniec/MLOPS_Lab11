@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from tokenizers import Tokenizer
 from src.scripts.settings import TOKENIZER_PATH, ONNX_MODEL_PATH, ONNX_CLASSIFIER_PATH
 from pydantic import BaseModel
+from mangum import Mangum
 
 app = FastAPI()
 
@@ -57,4 +58,5 @@ async def predict(request: PredictRequest):
         raise HTTPException(status_code=500, detail=str(f"Internal server error: {e}"))
 
 if __name__ == "__main__":
+    handler = Mangum(app)
     uvicorn.run(app)
