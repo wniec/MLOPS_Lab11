@@ -41,8 +41,6 @@ async def predict(request: PredictRequest):
         classifier_inputs = {
             classifier_input_name: embeddings.astype(np.float32)
         }
-        print("got here")
-        print(classifier_inputs)
 
         prediction_output = classifier_session.run(None, classifier_inputs)[0]
 
