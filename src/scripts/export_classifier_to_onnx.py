@@ -7,8 +7,6 @@ from skl2onnx.common.data_types import FloatTensorType
 
 from settings import ONNX_CLASSIFIER_PATH, CLASSIFIER_PATH, EMBEDDING_DIM
 
-from onnx import save
-
 
 def export_classifier_to_onnx():
     print(f"Loading classifier from {CLASSIFIER_PATH}...")

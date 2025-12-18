@@ -1,7 +1,7 @@
 # export_sentence_transformer_to_onnx.py
 
 import os
-from settings import *  # ja wiem, że to zła praktyka jest
+from settings import MODEL_PATH, ONNX_MODEL_PATH, TOKENIZER_PATH
 import torch
 from transformers import AutoTokenizer, AutoModel
 

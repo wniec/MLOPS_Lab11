@@ -23,7 +23,7 @@ jobs:
         run: uv sync --extra integration
 
       - name: Ruff
-        run: ruff check .
+        run: uvx ruff check .
 
       - name: Tests
         run: pytest tests
