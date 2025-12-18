@@ -27,3 +27,43 @@ jobs:
 
       - name: Tests
         run: pytest tests
+  deployment:
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        run: aws-actions/configure-aws-credentials@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --extra deployment
+
+      - name: Download artifacts
+        run: uv run src/scripts/download_artifacts.py
+
+      - name: Export classifier to ONNX
+        run: uv run src/scripts/export_classifier_to_onnx.py
+
+      - name: Export Sentence Transformer to ONNX
+        run: uv run src/scripts/export_sentence_transformer_to_onnx.py
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and Push Docker image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: sentiment-app-onnx
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REPOSITORY:$IMAGE_TAG .
+          docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

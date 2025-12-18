@@ -1,7 +1,7 @@
 # export_sentence_transformer_to_onnx.py
 
 import os
-from src.scripts.settings import *  # ja wiem, że to zła praktyka jest
+from settings import *  # ja wiem, że to zła praktyka jest
 import torch
 from transformers import AutoTokenizer, AutoModel
 
@@ -36,9 +36,9 @@ class SentenceEmbeddingModel(torch.nn.Module):
 
 def export_model_to_onnx():
     # Use AutoModel to get embeddings (not classification logits)
-    base_model = AutoModel.from_pretrained('../..' + MODEL_PATH, local_files_only=True)
+    base_model = AutoModel.from_pretrained(MODEL_PATH, local_files_only=True)
 
-    tokenizer = AutoTokenizer.from_pretrained('../..' + MODEL_PATH)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
     # Wrap model
     model = SentenceEmbeddingModel(base_model)
@@ -47,7 +47,7 @@ def export_model_to_onnx():
     dummy_text = "This is a sample input for ONNX export."
     inputs = tokenizer(dummy_text, return_tensors="pt")
 
-    onnx_path = '../..' + ONNX_MODEL_PATH
+    onnx_path = ONNX_MODEL_PATH
     os.makedirs(os.path.dirname(onnx_path), exist_ok=True)
 
     with torch.no_grad():
@@ -65,9 +65,8 @@ def export_model_to_onnx():
             opset_version=18,
             dynamo=False,
         )
-    if not os.path.exists('../..' + TOKENIZER_PATH):
-        os.makedirs('../..' + TOKENIZER_PATH)
-    tokenizer.save_pretrained('../..' + TOKENIZER_PATH)
+    os.makedirs(TOKENIZER_PATH, exist_ok=True)
+    tokenizer.save_pretrained(TOKENIZER_PATH)
 
     print(f"ONNX model exported to {onnx_path}")
     return onnx_path

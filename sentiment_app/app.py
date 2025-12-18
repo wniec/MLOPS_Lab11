@@ -8,11 +8,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-tokenizer = Tokenizer.from_file("."+TOKENIZER_PATH+"/tokenizer.json")
+tokenizer = Tokenizer.from_file(TOKENIZER_PATH+"/tokenizer.json")
 
-embedding_session = ort.InferenceSession("."+ONNX_MODEL_PATH)
+embedding_session = ort.InferenceSession(ONNX_MODEL_PATH)
 
-classifier_session = ort.InferenceSession("."+ONNX_CLASSIFIER_PATH)
+classifier_session = ort.InferenceSession(ONNX_CLASSIFIER_PATH)
 
 SENTIMENT_MAP = {0: 'negative', 1: 'neutral', 2: 'positive'}
 
